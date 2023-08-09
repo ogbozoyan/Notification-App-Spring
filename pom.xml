@@ -7,6 +7,13 @@
     <name>Archetype - simple-notification-app</name>
     <url>http://maven.apache.org</url>
 
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.1.2</version>
+        <relativePath/> <!-- lookup parent from repository -->
+    </parent>
+
     <packaging>pom</packaging>
 
     <modules>
