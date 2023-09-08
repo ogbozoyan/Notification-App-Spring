@@ -1,15 +1,22 @@
-version: "2.1"
+version: "3.7"
 services:
-  rabbitmq:
-    image: rabbitmq:3.10.7-management
-    hostname: rabbitmq
-    restart: always
-    environment:
-      - RABBITMQ_DEFAULT_USER=admin
-      - RABBITMQ_DEFAULT_PASS=admin
-      - RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS=-rabbit log_levels [{connection,error},{default,error}] disk_free_limit 2147483648
-    volumes:
-      - ./rabbitmq:/var/lib/rabbitmq
+  kafka:
+    image: landoop/fast-data-dev:latest
+    container_name: kafka
     ports:
-      - 15672:15672
-      - 5672:5672
+      - 3181:3181
+      - 3040:3040
+      - 7082:7082
+      - 7083:7083
+      - 9092:9092
+    environment:
+      ADV_HOST: 127.0.0.1
+      RUNTESTS: 0
+      SAMPLEDATA: 0
+      BROKER_PORT: 9092
+      REST_PORT: 7082
+      CONNECT_PORT: 7083
+      ZK_PORT: 3181
+      WEB_PORT: 3040
+      REGISTRY_PORT: 8081
+    restart: always
