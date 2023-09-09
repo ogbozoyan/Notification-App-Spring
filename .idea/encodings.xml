@@ -3,8 +3,8 @@
   <component name="Encoding" defaultCharsetForPropertiesFiles="UTF-8">
     <file url="file://$PROJECT_DIR$/consumer-svc/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/gateway-svc/src/main/java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/producer-svc/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/telegrambot-svc/src/main/java" charset="UTF-8" />
   </component>
 </project>
