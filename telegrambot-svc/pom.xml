@@ -9,7 +9,7 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.example</groupId>
-    <artifactId>producer-svc</artifactId>
+    <artifactId>telegrambot-svc</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>producer-svc</name>
     <description>producer-svc</description>
