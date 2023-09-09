@@ -1,2 +1,13 @@
 server:
   port: 8082
+bot:
+  token: ${TOKEN}
+---
+spring:
+  profiles:
+    active: dev
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/bot
+    username: admin
+    password: admin

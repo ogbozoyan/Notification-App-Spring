@@ -20,3 +20,14 @@ services:
       WEB_PORT: 3040
       REGISTRY_PORT: 8081
     restart: always
+
+  postgres:
+    image: postgres:latest
+    container_name: postgres
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: bot
+    restart: always
