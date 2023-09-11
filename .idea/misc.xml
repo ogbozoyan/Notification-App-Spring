@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ExternalStorageConfigurationManager" enabled="true" />
   <component name="MarkdownSettingsMigration">
@@ -10,6 +11,7 @@
         <option value="$PROJECT_DIR$/producer-svc/pom.xml" />
         <option value="$PROJECT_DIR$/gateway-svc/pom.xml" />
         <option value="$PROJECT_DIR$/consumer-svc/pom.xml" />
+        <option value="$PROJECT_DIR$/telegrambot-svc/pom.xml" />
       </list>
     </option>
   </component>

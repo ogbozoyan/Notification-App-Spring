@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="JpaBuddyIdeaProjectConfig">
+  <component name="JpaBuddyIdeaProjectConfig" newRepositoryParent="org.springframework.data.jpa.repository.JpaRepository">
     <option name="defaultUnitInitialized" value="true" />
     <option name="renamerInitialized" value="true" />
+    <option name="reverseEngineeringLastDbConnectionId" value="13cb065c-2a7f-4e79-b865-c2fc0e6d3cff" />
+    <option name="reLastEntityCreationPackage" value="telegrambot-svc/src/main/java/com/example/producersvc/model" />
   </component>
 </project>
