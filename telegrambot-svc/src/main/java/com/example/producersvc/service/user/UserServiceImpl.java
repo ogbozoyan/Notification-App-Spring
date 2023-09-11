@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -21,6 +22,7 @@ public class UserServiceImpl implements UserService {
     protected ModelMapper patchingMapper;
 
     @Override
+    @Transactional
     public UserEntity save(UserEntity user) {
         return repository.saveAndFlush(user);
     }
@@ -33,21 +35,25 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public UserEntity findById(Long id) {
         return repository.findById(id).orElseThrow();
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<UserEntity> findAll() {
         return repository.findAll();
     }
 
     @Override
+    @Transactional
     public void delete(Long id) {
         repository.deleteById(id);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public UserEntity findByChatId(String chatId) {
         return repository.findByChatId(chatId);
     }
