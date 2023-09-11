@@ -30,7 +30,7 @@ public class EmailServiceImpl implements EmailService {
             message.setText(text);
 
             sender.send(message);
-        } catch (MailException e) {
+        } catch (Exception e) {
             throw e;
         }
     }
