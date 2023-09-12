@@ -9,10 +9,10 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.example</groupId>
-    <artifactId>gateway-svc</artifactId>
+    <artifactId>centrobank-svc</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>gateway-svc</name>
-    <description>gateway-svc</description>
+    <name>centrobank-svc</name>
+    <description>centrobank-svc</description>
     <properties>
         <java.version>17</java.version>
         <spring-cloud.version>2022.0.4</spring-cloud.version>
@@ -47,7 +47,16 @@
             <scope>test</scope>
         </dependency>
 
+        <!--     Sleuth   -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-sleuth</artifactId>
+            <version>3.1.9</version>
+        </dependency>
+        <!--     /Sleuth   -->
+
     </dependencies>
+
     <dependencyManagement>
         <dependencies>
             <dependency>

@@ -12,6 +12,8 @@
         <option value="$PROJECT_DIR$/gateway-svc/pom.xml" />
         <option value="$PROJECT_DIR$/consumer-svc/pom.xml" />
         <option value="$PROJECT_DIR$/telegrambot-svc/pom.xml" />
+        <option value="$PROJECT_DIR$/kafka-consumer-svc/pom.xml" />
+        <option value="$PROJECT_DIR$/centrobank-svc/pom.xml" />
       </list>
     </option>
   </component>

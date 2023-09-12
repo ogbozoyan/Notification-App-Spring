@@ -4,10 +4,10 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class GatewaySvcApplication {
+public class CentrobankSvc {
 
     public static void main(String[] args) {
-        SpringApplication.run(GatewaySvcApplication.class, args);
+        SpringApplication.run(CentrobankSvc.class, args);
     }
 
 }
