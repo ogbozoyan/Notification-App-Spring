@@ -6,7 +6,7 @@ bot:
 
 spring:
   application:
-    name: bot service
+    name: bot-service
   cloud:
     compatibility-verifier:
       enabled: false
@@ -27,15 +27,23 @@ spring:
           socketFactory:
             port: 465
             class: javax.net.ssl.SSLSocketFactory
-
+kafka:
+  server: localhost # kafka ip
+  port: 9092 #kafka port
+  topic: telegram-bot-topic
+  consumer:
+    id: kafka-consumer-telegrambot-svc
+    group:
+      id: kafka-consumer-telegrambot-svc
 ---
 spring:
   main:
     allow-circular-references: true
   profiles:
     active: dev
-
   datasource:
     url: jdbc:postgresql://localhost:5432/bot
     username: admin
     password: admin
+  jpa:
+    show-sql: false

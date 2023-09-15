@@ -1,6 +1,8 @@
 package com.example.producersvc.service.user;
 
+import com.example.producersvc.model.CurrencyEntity;
 import com.example.producersvc.model.UserEntity;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -21,4 +23,6 @@ public interface UserService {
     void delete(Long id);
 
     UserEntity findByChatId(String chatId);
+
+
 }

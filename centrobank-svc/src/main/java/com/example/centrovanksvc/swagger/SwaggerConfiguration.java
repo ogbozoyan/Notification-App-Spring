@@ -1,4 +1,4 @@
-package com.example.consumersvc.swagger;
+package com.example.centrovanksvc.swagger;
 
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
@@ -11,8 +11,8 @@ import org.springframework.context.annotation.Configuration;
 import java.util.List;
 
 /**
- * Created by ogbozoyan at 13.01.2023
- * github.com/ogbozoyan
+ * @author ogbozoyan
+ * @since 15.09.2023
  */
 @Configuration
 @SecurityScheme(
@@ -22,7 +22,6 @@ import java.util.List;
         scheme = "bearer"
 )
 public class SwaggerConfiguration {
-
     @Bean
     public OpenAPI springDocOpenApi() {
         return new OpenAPI()
@@ -35,5 +34,4 @@ public class SwaggerConfiguration {
         return new Info();
 
     }
-
 }

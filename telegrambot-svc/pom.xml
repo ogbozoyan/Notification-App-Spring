@@ -19,6 +19,8 @@
     </properties>
     <dependencies>
 
+        <!-- Core -->
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
@@ -26,11 +28,6 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-configuration-processor</artifactId>
-            <optional>true</optional>
-        </dependency>
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
             <optional>true</optional>
         </dependency>
         <dependency>
@@ -43,7 +40,20 @@
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
 
+        <!-- /Core -->
+
+        <!-- Lombok -->
+
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <!-- /Lombok -->
+
         <!--    Data    -->
+
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
@@ -58,6 +68,7 @@
             <artifactId>modelmapper</artifactId>
             <version>2.3.5</version>
         </dependency>
+
         <!--    /Data    -->
 
         <!-- Swagger -->
@@ -71,6 +82,7 @@
         <!-- /Swagger -->
 
         <!--    Telegram Bot    -->
+
         <dependency>
             <groupId>org.telegram</groupId>
             <artifactId>telegrambots-spring-boot-starter</artifactId>
@@ -81,17 +93,21 @@
             <artifactId>telegrambots-abilities</artifactId>
             <version>6.7.0</version>
         </dependency>
+
         <!--    /Telegram Bot    -->
 
         <!--     Sleuth   -->
+
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-sleuth</artifactId>
             <version>3.1.9</version>
         </dependency>
+
         <!--     /Sleuth   -->
 
         <!-- Mail -->
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-mail</artifactId>
@@ -100,9 +116,20 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-thymeleaf</artifactId>
         </dependency>
+
         <!-- /Mail -->
+
+        <!--Kafka-->
+
+        <dependency>
+            <groupId>org.springframework.kafka</groupId>
+            <artifactId>spring-kafka</artifactId>
+        </dependency>
+
+        <!--/Kafka-->
     </dependencies>
 
+    <!-- BOM -->
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -114,6 +141,7 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
+    <!-- /BOM -->
 
     <build>
         <plugins>

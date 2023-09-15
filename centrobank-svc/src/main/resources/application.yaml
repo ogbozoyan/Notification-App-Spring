@@ -1,8 +1,17 @@
 server:
   port: 8080
+
 spring:
+  cloud:
+    compatibility-verifier:
+      enabled: false
+  datasource:
+    url: jdbc:postgresql://localhost:5432/bot
+    username: admin
+    password: admin
   application:
     name: centrobank-svc
+
 ---
 spring:
   profiles:

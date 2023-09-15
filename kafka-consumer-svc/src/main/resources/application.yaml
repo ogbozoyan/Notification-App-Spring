@@ -1,9 +1,0 @@
-server:
-  port: 8081
-spring:
-  application:
-    name: kafka-consumer-svc
----
-spring:
-  profiles:
-    active: dev

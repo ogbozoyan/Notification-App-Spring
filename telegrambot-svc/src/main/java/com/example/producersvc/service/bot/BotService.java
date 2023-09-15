@@ -1,17 +1,23 @@
 package com.example.producersvc.service.bot;
 
+import com.example.producersvc.model.CurrencyEntity;
 import com.example.producersvc.model.EmailConfirmationEntity;
 import com.example.producersvc.model.UserEntity;
 import com.example.producersvc.model.UserState;
+import com.example.producersvc.repository.CurrencyEntityRepository;
 import com.example.producersvc.repository.EmailConfirmationEntityRepository;
+import com.example.producersvc.repository.UserLCurrencyRepository;
 import com.example.producersvc.repository.UserStateRepository;
 import com.example.producersvc.service.mail.EmailService;
 import com.example.producersvc.service.user.UserService;
+import com.example.producersvc.web.dto.ProducerDTO;
 import jakarta.annotation.PostConstruct;
+import jakarta.persistence.EntityManager;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.telegram.abilitybots.api.bot.AbilityBot;
 import org.telegram.abilitybots.api.objects.Ability;
 import org.telegram.abilitybots.api.objects.MessageContext;
@@ -20,8 +26,9 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
-import java.util.UUID;
+import java.util.*;
 
+import static java.time.LocalTime.now;
 import static org.telegram.abilitybots.api.objects.Locality.ALL;
 import static org.telegram.abilitybots.api.objects.Privacy.PUBLIC;
 
@@ -45,6 +52,12 @@ public class BotService extends AbilityBot {
     private EmailConfirmationEntityRepository emailConfirmationEntityRepository;
     @Autowired
     private UserStateRepository userStateRepository;
+    @Autowired
+    private CurrencyEntityRepository currencyEntityRepository;
+    @Autowired
+    private UserLCurrencyRepository userLCurrencyRepository;
+    @Autowired
+    private EntityManager entityManager;
 
     @PostConstruct
     public void init() {
@@ -62,7 +75,10 @@ public class BotService extends AbilityBot {
     }
 
     public Ability start() {
-        return Ability.builder().name("start").info(Constants.START_DESCRIPTION).locality(ALL).privacy(PUBLIC).action(ctx -> silent.send("Welcome to bot, need to registration to continue /reg", ctx.chatId())).build();
+        return Ability.builder().name("start").info(Constants.START_DESCRIPTION)
+                .locality(ALL)
+                .privacy(PUBLIC)
+                .action(ctx -> silent.send("Welcome to bot, need to registration to continue /reg to get more information /info", ctx.chatId())).build();
     }
 
     public Ability registration() {
@@ -105,8 +121,227 @@ public class BotService extends AbilityBot {
                 .build();
     }
 
+    public Ability info() {
+        return Ability.builder()
+                .name("info")
+                .locality(ALL)
+                .privacy(PUBLIC)
+                .action(this::infoHandler)
+                .build();
+    }
 
-    private void contextHandler(MessageContext messageContext) {
+    public Ability sub() {
+        return Ability.builder()
+                .name("sub")
+                .locality(ALL)
+                .privacy(PUBLIC)
+                .action(this::subHandler)
+                .build();
+    }
+
+    public Ability unSub() {
+        return Ability.builder()
+                .name("unsub")
+                .locality(ALL)
+                .privacy(PUBLIC)
+                .action(this::unSubHandler)
+                .build();
+    }
+
+    public Ability onNotification() {
+        return Ability.builder()
+                .name("on")
+                .locality(ALL)
+                .privacy(PUBLIC)
+                .action(this::onNotification)
+                .build();
+    }
+
+    public Ability offNotification() {
+        return Ability.builder()
+                .name("off")
+                .locality(ALL)
+                .privacy(PUBLIC)
+                .action(this::offNotification)
+                .build();
+    }
+
+    public Ability unReg() {
+        return Ability.builder()
+                .name("unreg")
+                .locality(ALL)
+                .privacy(PUBLIC)
+                .action(this::unReg)
+                .build();
+    }
+
+    @Transactional
+    public void unReg(MessageContext messageContext) {
+        UserEntity user = userService.findByChatId(String.valueOf(messageContext.chatId()));
+        if (user != null) {
+            userService.delete(user.getId());
+            emailConfirmationEntityRepository.delete(emailConfirmationEntityRepository.findByEmail(user.getEmail()));
+            userLCurrencyRepository.deleteByUser(user);
+            silent.send("You're acc was deleted, need to registrate again", messageContext.chatId());
+        }
+    }
+
+    @Transactional
+    public void onNotification(MessageContext messageContext) {
+        UserEntity user = userService.findByChatId(String.valueOf(messageContext.chatId()));
+        UserState registered = userStateRepository.findByName("registered");
+
+        if (user == null || !user.getStateId().getId().equals(registered.getId())) {
+            silent.send("Need to register /reg {mail}", messageContext.chatId());
+            return;
+        }
+        Message messageCon = messageContext.update().getMessage();
+        String messageFromCon = messageCon.getText().substring(3).replaceAll(" ", "");
+
+        if (messageFromCon.isEmpty()) {
+            silent.send("What kinda notifications you want to turn on email or chat ? /on {mail/chat}", messageContext.chatId());
+            return;
+        }
+        if (messageFromCon.equals("mail")) {
+            user.setSubMail(true);
+            userService.update(user);
+            silent.send("Notification to email: " + user.getEmail() + " are turned on", messageContext.chatId());
+        } else if (messageFromCon.equals("chat")) {
+            user.setSubChat(true);
+            userService.update(user);
+            silent.send("Inchat notifications turned on", messageContext.chatId());
+        } else {
+            silent.send("Unexpected notification type: " + messageFromCon, messageContext.chatId());
+        }
+
+    }
+
+    @Transactional
+    public void offNotification(MessageContext messageContext) {
+        UserEntity user = userService.findByChatId(String.valueOf(messageContext.chatId()));
+        UserState registered = userStateRepository.findByName("registered");
+
+        if (user == null || !user.getStateId().getId().equals(registered.getId())) {
+            silent.send("Need to register /reg {mail}", messageContext.chatId());
+            return;
+        }
+        Message messageCon = messageContext.update().getMessage();
+        String messageFromCon = messageCon.getText().substring(4).replaceAll(" ", "");
+
+        if (messageFromCon.isEmpty()) {
+            silent.send("What kinda notifications you want to turn off email or chat ? /off {mail/chat}", messageContext.chatId());
+            return;
+        }
+        if (messageFromCon.equals("mail")) {
+            user.setSubMail(false);
+            userService.update(user);
+            silent.send("Notification to email: " + user.getEmail() + " are turned off", messageContext.chatId());
+        } else if (messageFromCon.equals("chat")) {
+            user.setSubChat(false);
+            userService.update(user);
+            silent.send("Inchat notifications turned off", messageContext.chatId());
+        } else {
+            silent.send("Unexpected notification type: " + messageFromCon, messageContext.chatId());
+        }
+    }
+
+    @Transactional
+    public void unSubHandler(MessageContext messageContext) {
+        UserEntity user = userService.findByChatId(String.valueOf(messageContext.chatId()));
+        UserState registered = userStateRepository.findByName("registered");
+
+        if (user == null || !user.getStateId().getId().equals(registered.getId())) {
+            silent.send("Need to register /reg {mail}", messageContext.chatId());
+            return;
+        }
+        user = entityManager.find(UserEntity.class, user.getId());
+
+        Message messageCon = messageContext.update().getMessage();
+        String messageFromCon = messageCon.getText().substring(6).replaceAll(" ", "");
+
+        if (messageFromCon.isEmpty()) {
+            silent.send("Need to provide currency", messageContext.chatId());
+            return;
+        }
+
+        CurrencyEntity currency = currencyEntityRepository.findByName(messageFromCon);
+
+        if (currency == null) {
+            silent.send("Wrong currency name", messageContext.chatId());
+            return;
+        }
+        currency = entityManager.find(CurrencyEntity.class, currency.getId());
+
+        Set<CurrencyEntity> userCurrencyEntities = user.getCurrencyEntities();
+        if (userCurrencyEntities != null && !userCurrencyEntities.isEmpty()) {
+            for (CurrencyEntity userCurrencyEntity : userCurrencyEntities) {
+                if (userCurrencyEntity.getId().equals(currency.getId())) {
+                    userLCurrencyRepository.delete(userLCurrencyRepository.findByUserAndCurrency(user, currency));
+                }
+            }
+        }
+        silent.send("Unsubscribed from " + currency.getName(), messageContext.chatId());
+
+    }
+
+    @Transactional
+    public void subHandler(MessageContext messageContext) {
+        UserEntity user = userService.findByChatId(String.valueOf(messageContext.chatId()));
+        UserState registered = userStateRepository.findByName("registered");
+
+        if (user == null || !user.getStateId().getId().equals(registered.getId())) {
+            silent.send("Need to register /reg {mail}", messageContext.chatId());
+            return;
+        }
+
+        Message messageCon = messageContext.update().getMessage();
+        String messageFromCon = messageCon.getText().substring(4).replaceAll(" ", "");
+
+        if (messageFromCon.isEmpty()) {
+            silent.send("Need to provide currency", messageContext.chatId());
+            return;
+        }
+
+        CurrencyEntity currency = currencyEntityRepository.findByName(messageFromCon);
+
+        if (currency == null) {
+            silent.send("Wrong currency name", messageContext.chatId());
+            return;
+        }
+
+        Set<CurrencyEntity> userCurrencyEntities = user.getCurrencyEntities();
+        if (userCurrencyEntities != null) {
+            if (!userCurrencyEntities.contains(currency))
+                userCurrencyEntities.add(currency);
+        } else {
+            user.setCurrencyEntities(new HashSet<>(Collections.singleton(currency)));
+        }
+        userService.update(user);
+        silent.send("Subscribed to " + currency.getName(), messageContext.chatId());
+    }
+
+    private void infoHandler(MessageContext messageContext) {
+        String info = """
+                List of commands:
+                                
+                /reg {mail} - registration
+                /unreg - deletes user info, need to /reg again
+                /code {code} - code verification
+                /resend - resend verification code
+                /changemail {mail} - changing mail without confirmation, i'm to lazy to create algo
+                /off mail/chat - unsubscribe from notifications on mail/chat
+                /on mail/chat - subscribe to mail/chat notifications(by default when you finish registration you already subscribed c:)
+                /sub {currency} - currency: EU, US, RU, KR - bank key rate; subscribe for currency changes
+                /unsub {currency} - currency: EU, US, RU, KR - bank key rate; unsubscribe for currency changes
+                                
+                This is pet bot for simple practice in message brokers,spring boot 3 and microservice. Whole source code you can find - https://github.com/ogbozoyan/Notification-App-Spring
+                """;
+        silent.send(info, messageContext.chatId());
+    }
+
+
+    @Transactional
+    public void contextHandler(MessageContext messageContext) {
         UserEntity user = userService.findByChatId(String.valueOf(messageContext.chatId()));
         UserState registered = userStateRepository.findByName("registered");
 
@@ -245,6 +480,57 @@ public class BotService extends AbilityBot {
 
         }
 
+    }
+
+    @Transactional
+    public void sendToUsers(List<ProducerDTO> userList) {
+        if (userList != null && !userList.isEmpty()) {
+            for (ProducerDTO dto : userList) {
+
+                UserEntity user = userService.findById(dto.getUserId());
+                if (user == null) {
+                    throw new RuntimeException("Can't find user with id: " + dto.getUserId());
+                }
+
+                String message = dto.getMessage();
+                Long chatId = Long.valueOf(user.getChatId());
+                String userEmail = user.getEmail();
+
+                if (user.getSubChat()) { //if user subscribed to receive notifications in chat
+                    if (sendToChatId(chatId, message).isPresent()) {
+                        log.info("Notification to chat sent, chatId: {}", chatId);
+                    } else {
+                        log.info("Didn't sent message to chat with id: " + chatId);
+                    }
+                } else {
+                    log.info("User not subscribed to chat notifications");
+                }
+
+
+                String subject = "Курс на " + now();
+                if (user.getSubMail()) {//if user subscribed to receive notifications to mail
+                    if (emailService.sendEmail(userEmail, subject, message)) {
+                        log.info("Email sent to: {} subject: {} with text: {}", userEmail, subject, message);
+                    } else {
+                        log.info("Didn't sent message to mail {}", userEmail);
+                    }
+                } else {
+                    log.info("User not subscribed to email notifications");
+                }
+            }
+        }
+    }
+
+
+    private Optional<Message> sendToChatId(Long chatId, String message) {
+        Optional<Message> send;
+        try {
+            send = silent.send(message, chatId);
+            return send;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Optional.empty();
+        }
     }
 
     @Override

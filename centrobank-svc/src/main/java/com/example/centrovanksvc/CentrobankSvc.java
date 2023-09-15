@@ -1,4 +1,4 @@
-package com.example.gatewaysvc;
+package com.example.centrovanksvc;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
