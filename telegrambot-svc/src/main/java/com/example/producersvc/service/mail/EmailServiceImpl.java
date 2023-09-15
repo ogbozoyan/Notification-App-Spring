@@ -1,8 +1,8 @@
 package com.example.producersvc.service.mail;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Component;
@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
  * @since 11.09.2023
  */
 @Component
+@Slf4j
 public class EmailServiceImpl implements EmailService {
     @Autowired
     private JavaMailSender sender;
@@ -20,7 +21,7 @@ public class EmailServiceImpl implements EmailService {
     public String MAIL_USERNAME;
 
     @Override
-    public void sendEmail(String to, String subject, String text) {
+    public boolean sendEmail(String to, String subject, String text) {
         try {
             SimpleMailMessage message = new SimpleMailMessage();
 
@@ -30,8 +31,10 @@ public class EmailServiceImpl implements EmailService {
             message.setText(text);
 
             sender.send(message);
+            return true;
         } catch (Exception e) {
-            throw e;
+            e.printStackTrace();
+            return false;
         }
     }
 }

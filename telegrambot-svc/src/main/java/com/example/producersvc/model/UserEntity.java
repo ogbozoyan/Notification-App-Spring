@@ -36,4 +36,10 @@ public class UserEntity {
     @JoinColumn(name = "state_id")
     private UserState stateId;
 
+    @Column(name = "sub_email")
+    private Boolean subMail;
+    @Column(name = "sub_chat")
+    private Boolean subChat;
+
+
 }

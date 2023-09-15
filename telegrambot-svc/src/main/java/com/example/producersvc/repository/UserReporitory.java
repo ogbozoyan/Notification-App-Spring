@@ -9,6 +9,6 @@ import org.springframework.stereotype.Repository;
  * @since 09.09.2023
  */
 @Repository
-public interface UserReporitory extends JpaRepository<UserEntity,Long> {
+public interface UserReporitory extends JpaRepository<UserEntity, Long> {
     UserEntity findByChatId(String chatId);
 }

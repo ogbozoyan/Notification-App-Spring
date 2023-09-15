@@ -24,6 +24,8 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public UserEntity save(UserEntity user) {
+        user.setSubMail(true);
+        user.setSubChat(true);
         return repository.saveAndFlush(user);
     }
 

@@ -1,4 +1,4 @@
-package com.example.consumersvc.swagger;
+package com.example.centrovanksvc.swagger;
 
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.web.bind.annotation.CrossOrigin;
