@@ -10,7 +10,8 @@ import com.example.producersvc.repository.UserLCurrencyRepository;
 import com.example.producersvc.repository.UserStateRepository;
 import com.example.producersvc.service.mail.EmailService;
 import com.example.producersvc.service.user.UserService;
-import com.example.producersvc.web.dto.ProducerDTO;
+import com.example.producersvc.web.dto.CurrencyDTO;
+import com.example.producersvc.web.dto.KafkaMessageFromProducerDTO;
 import jakarta.annotation.PostConstruct;
 import jakarta.persistence.EntityManager;
 import lombok.extern.slf4j.Slf4j;
@@ -331,8 +332,8 @@ public class BotService extends AbilityBot {
                 /changemail {mail} - changing mail without confirmation, i'm to lazy to create algo
                 /off mail/chat - unsubscribe from notifications on mail/chat
                 /on mail/chat - subscribe to mail/chat notifications(by default when you finish registration you already subscribed c:)
-                /sub {currency} - currency: EU, US, RU, KR - bank key rate; subscribe for currency changes
-                /unsub {currency} - currency: EU, US, RU, KR - bank key rate; unsubscribe for currency changes
+                /sub {currency} - currency: EUR, USD, CNY  - bank key rate; subscribe for currency changes
+                /unsub {currency} - currency: EUR, USD, CNY - bank key rate; unsubscribe for currency changes
                                 
                 This is pet bot for simple practice in message brokers,spring boot 3 and microservice. Whole source code you can find - https://github.com/ogbozoyan/Notification-App-Spring
                 """;
@@ -483,21 +484,42 @@ public class BotService extends AbilityBot {
     }
 
     @Transactional
-    public void sendToUsers(List<ProducerDTO> userList) {
+    public void sendToUsers(List<KafkaMessageFromProducerDTO> userList) {
         if (userList != null && !userList.isEmpty()) {
-            for (ProducerDTO dto : userList) {
+            for (KafkaMessageFromProducerDTO dto : userList) {
 
                 UserEntity user = userService.findById(dto.getUserId());
                 if (user == null) {
                     throw new RuntimeException("Can't find user with id: " + dto.getUserId());
                 }
 
-                String message = dto.getMessage();
+                CurrencyDTO currencyDTO = dto.getCurrencyDTO();
+                StringBuilder message = new StringBuilder("""
+                        Prices:
+                                                
+                        """);
+                Set<CurrencyEntity> userCurrencyEntities = user.getCurrencyEntities();
+
+                if (!userCurrencyEntities.isEmpty()) {
+                    for (CurrencyEntity userCurrencyEntity : userCurrencyEntities) {
+                        if (userCurrencyEntity.getName().equalsIgnoreCase("usd")) {
+                            message.append("USD: ").append(currencyDTO.getUsd()).append("\n");
+                        } else if (userCurrencyEntity.getName().equalsIgnoreCase("cny")) {
+                            message.append("CNY: ").append(currencyDTO.getCny()).append("\n");
+                        } else if (userCurrencyEntity.getName().equalsIgnoreCase("eur")) {
+                            message.append("EUR: ").append(currencyDTO.getEur()).append("\n");
+                        }
+                    }
+                } else { //if a user isn't subscribed to any currency
+                    log.info("User with id {} and email {} arent subscribed to any currency",user.getId(),user.getEmail());
+                    return;
+                }
+
                 Long chatId = Long.valueOf(user.getChatId());
                 String userEmail = user.getEmail();
 
                 if (user.getSubChat()) { //if user subscribed to receive notifications in chat
-                    if (sendToChatId(chatId, message).isPresent()) {
+                    if (sendToChatId(chatId, message.toString()).isPresent()) {
                         log.info("Notification to chat sent, chatId: {}", chatId);
                     } else {
                         log.info("Didn't sent message to chat with id: " + chatId);
@@ -509,8 +531,8 @@ public class BotService extends AbilityBot {
 
                 String subject = "Курс на " + now();
                 if (user.getSubMail()) {//if user subscribed to receive notifications to mail
-                    if (emailService.sendEmail(userEmail, subject, message)) {
-                        log.info("Email sent to: {} subject: {} with text: {}", userEmail, subject, message);
+                    if (emailService.sendEmail(userEmail, subject, message.toString())) {
+                        log.info("Email sent to: {} subject: {} with text: {}", userEmail, subject, message.toString());
                     } else {
                         log.info("Didn't sent message to mail {}", userEmail);
                     }

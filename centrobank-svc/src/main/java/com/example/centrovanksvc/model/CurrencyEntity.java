@@ -1,4 +1,4 @@
-package com.example.producersvc.model;
+package com.example.centrovanksvc.model;
 
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -14,10 +14,13 @@ public class CurrencyEntity {
     @Column(name = "id", nullable = false)
     private Long id;
 
-    @Column(name = "name", length = Integer.MAX_VALUE)
-    private String name;
+    @Column(name = "current_price")
+    private Double currentPrice;
+
     @Column(name = "previous_price")
     private Double previousPrice;
-    @Column(name = "current_price")
-    private Double current_price;
+
+    @Column(name = "name", length = Integer.MAX_VALUE)
+    private String name;
+
 }

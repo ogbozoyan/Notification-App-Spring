@@ -1,7 +1,7 @@
 package com.example.producersvc.web.controller;
 
 import com.example.producersvc.service.bot.BotService;
-import com.example.producersvc.web.dto.ProducerDTO;
+import com.example.producersvc.web.dto.KafkaMessageFromProducerDTO;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,7 +24,7 @@ public class TelegramController {
 
     @PostMapping("/send-to-users")
     @Tag(name = "Рассылка пользователей которые подписаны на рассылку")
-    public void sendToUsers(@RequestBody List<ProducerDTO> userList) {
+    public void sendToUsers(@RequestBody List<KafkaMessageFromProducerDTO> userList) {
         botService.sendToUsers(userList);
     }
 }
