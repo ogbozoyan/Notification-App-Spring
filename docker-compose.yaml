@@ -1,26 +1,43 @@
 version: "3.7"
 services:
-  kafka:
-    image: landoop/fast-data-dev:latest
-    container_name: kafka
-    ports:
-      - 3181:3181
-      - 3040:3040
-      - 7082:7082
-      - 7083:7083
-      - 9092:9092
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
     environment:
-      ADV_HOST: 127.0.0.1
-      RUNTESTS: 0
-      SAMPLEDATA: 0
-      BROKER_PORT: 9092
-      REST_PORT: 7082
-      CONNECT_PORT: 7083
-      ZK_PORT: 3181
-      WEB_PORT: 3040
-      REGISTRY_PORT: 8081
-    restart: always
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - 22181:2181
 
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    depends_on:
+      - zookeeper
+    ports:
+      - 9092:9092
+    hostname: kafka
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 2
+  kafka-ui:
+    image: provectuslabs/kafka-ui
+    container_name: kafka-ui
+    ports:
+      - 8090:8080
+    restart: always
+    environment:
+      KAFKA_CLUSTERS_0_NAME: local
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
+      KAFKA_CLUSTERS_0_ZOOKEEPER: zookeeper:2181
+      AUTH_TYPE: "LOGIN_FORM"
+      SPRING_SECURITY_USER_NAME: admin
+      SPRING_SECURITY_USER_PASSWORD: admin
+    links:
+      - kafka
+      - zookeeper
   postgres:
     image: postgres:latest
     container_name: postgres
