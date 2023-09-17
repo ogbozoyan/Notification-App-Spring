@@ -3,7 +3,6 @@ server:
 bot:
   token: ${TOKEN}
   name: ${NAME}
-
 spring:
   application:
     name: bot-service
@@ -37,6 +36,9 @@ kafka:
       id: kafka-consumer-telegrambot-svc
 ---
 spring:
+  sql:
+    init:
+      mode: always
   main:
     allow-circular-references: true
   profiles:
@@ -45,5 +47,7 @@ spring:
     url: jdbc:postgresql://localhost:5432/bot
     username: admin
     password: admin
+    driver-class-name: org.postgresql.Driver
   jpa:
-    show-sql: false
+    hibernate:
+      ddl-auto: none

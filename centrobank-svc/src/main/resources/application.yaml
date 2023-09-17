@@ -1,6 +1,10 @@
 server:
   port: 8080
-
+feign:
+  client:
+    config:
+      default:
+        loggerLevel: full
 spring:
   cloud:
     compatibility-verifier:
@@ -9,9 +13,21 @@ spring:
     url: jdbc:postgresql://localhost:5432/bot
     username: admin
     password: admin
+    driver-class-name: org.postgresql.Driver
   application:
     name: centrobank-svc
-
+services:
+  centrobank:
+    url: https://www.cbr.ru/scripts/
+    token: null
+  freecurrency:
+    url: https://api.freecurrencyapi.com/v1/
+    token: ${API_TOKEN}
+kafka:
+  server: localhost # kafka ip
+  port: 9092 #kafka port
+  topic: telegram-bot-topic
+  producer: kafka-producer-telegrambot-svc
 ---
 spring:
   profiles:
